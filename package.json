@@ -1,0 +1,13 @@
+{
+  "name": "tsc-tree-helpers",
+  "packageManager": "yarn@4.3.1",
+  "main": "src/index.ts",
+  "version": "1.0.0",
+  "dependencies": {
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.19.4"
+  }
+}
