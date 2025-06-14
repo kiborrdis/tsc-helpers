@@ -41,6 +41,11 @@ export const convertTypeToTypeDescription = (
 
   let aliasName = type.aliasSymbol?.escapedName as string;
   let aliasCoreName = type.aliasSymbol?.escapedName as string;
+  let baseName = type.symbol?.escapedName;
+
+  if (baseName === 'Date') {
+    return { kind: 'alias', name: '_Date' };
+  }
 
   if (type.aliasTypeArguments && type.aliasTypeArguments.length > 0) {
     const names = type.aliasTypeArguments.map(
