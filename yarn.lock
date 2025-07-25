@@ -1997,9 +1997,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsc-tree-helpers@workspace:.":
+"tsc-helpers@workspace:.":
   version: 0.0.0-use.local
-  resolution: "tsc-tree-helpers@workspace:."
+  resolution: "tsc-helpers@workspace:."
   dependencies:
     "@eslint/js": "npm:^9.31.0"
     "@types/node": "npm:^24.0.0"

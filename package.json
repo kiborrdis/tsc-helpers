@@ -1,5 +1,5 @@
 {
-  "name": "tsc-tree-helpers",
+  "name": "tsc-helpers",
   "packageManager": "yarn@4.3.1",
   "main": "src/index.ts",
   "version": "1.0.0",
