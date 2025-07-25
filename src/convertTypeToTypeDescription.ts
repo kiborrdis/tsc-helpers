@@ -1,5 +1,5 @@
-import * as ts from 'typescript';
-import { TypeDescription } from './types';
+import * as ts from "typescript";
+import { TypeDescription } from "./types";
 
 let ti = 0;
 
@@ -8,15 +8,15 @@ export const convertAwaitedTypeToTypeDescription = (
   type: ts.Type,
   checker: ts.TypeChecker,
   node?: ts.Node,
-  depth: string = '',
+  depth: string = "",
 ): TypeDescription => {
   const awaitedType = checker.getAwaitedType(type);
 
   // TODO handle it better
   if (!awaitedType) {
     return {
-      kind: 'base',
-      name: 'number',
+      kind: "base",
+      name: "number",
     };
   }
 
@@ -34,17 +34,18 @@ export const convertTypeToTypeDescription = (
   type: ts.Type,
   checker: ts.TypeChecker,
   node?: ts.Node,
-  depth: string = '',
+  depth: string = "",
 ): TypeDescription => {
-  let nextDepth = depth + ' ';
-  let typeDescr: any = {};
+  const nextDepth = depth + " ";
+  //
+  let typeDescr: TypeDescription | null = null;
 
   let aliasName = type.aliasSymbol?.escapedName as string;
-  let aliasCoreName = type.aliasSymbol?.escapedName as string;
-  let baseName = type.symbol?.escapedName;
+  const aliasCoreName = type.aliasSymbol?.escapedName as string;
+  const baseName = type.symbol?.escapedName;
 
-  if (baseName === 'Date') {
-    return { kind: 'alias', name: '_Date' };
+  if (baseName === "Date") {
+    return { kind: "alias", name: "_Date" };
   }
 
   if (type.aliasTypeArguments && type.aliasTypeArguments.length > 0) {
@@ -52,27 +53,28 @@ export const convertTypeToTypeDescription = (
       (t) => t.aliasSymbol?.escapedName || String(ti++),
     );
 
-    aliasName = `${aliasName}<${names.join(', ')}>`;
+    aliasName = `${aliasName}<${names.join(", ")}>`;
   }
 
-  let baseAlias = aliasCoreName === 'Omit' || aliasCoreName === 'Record';
+  let baseAlias = aliasCoreName === "Omit" || aliasCoreName === "Record";
 
   if (aliasName && convertedTypes[aliasName] && !baseAlias) {
-    return { kind: 'alias', name: aliasName };
+    return { kind: "alias", name: aliasName };
   }
 
   // Current type can have property of same type down the tree, so we add placeholder to avoid infinite recursion
   if (aliasName && !baseAlias) {
     convertedTypes[aliasName] = {
-      kind: 'alias',
-      name: '____temporary',
+      kind: "alias",
+      name: "____temporary",
     };
   }
 
   if (type.isLiteral()) {
     typeDescr = {
-      kind: 'literal',
-      value: type.value,
+      kind: "literal",
+      value:
+        typeof type.value !== "object" ? type.value : type.value.base10Value,
     };
   } else if (
     type === checker.getStringType() ||
@@ -81,12 +83,12 @@ export const convertTypeToTypeDescription = (
     type === checker.getNeverType()
   ) {
     typeDescr = {
-      kind: 'base',
+      kind: "base",
       name: checker.typeToString(type),
     };
   } else if (type.isUnion()) {
     typeDescr = {
-      kind: 'union',
+      kind: "union",
       variants: type.types.map((t) =>
         convertTypeToTypeDescription(
           convertedTypes,
@@ -99,7 +101,7 @@ export const convertTypeToTypeDescription = (
     };
   } else if (checker.isTupleType(type)) {
     typeDescr = {
-      kind: 'tuple',
+      kind: "tuple",
       values: checker.getTypeArguments(type as ts.TypeReference).map((t) => {
         return convertTypeToTypeDescription(
           convertedTypes,
@@ -114,11 +116,11 @@ export const convertTypeToTypeDescription = (
     const numberIndexType = type.getNumberIndexType();
 
     if (!numberIndexType) {
-      throw new Error('Error transfroming typescript types(numberIndexType)');
+      throw new Error("Error transfroming typescript types(numberIndexType)");
     }
 
     typeDescr = {
-      kind: 'array',
+      kind: "array",
       value: convertTypeToTypeDescription(
         convertedTypes,
         numberIndexType,
@@ -128,13 +130,13 @@ export const convertTypeToTypeDescription = (
       ),
     };
   } else if (
-    aliasCoreName === 'Record' &&
+    aliasCoreName === "Record" &&
     type.getProperties().length === 0 &&
     type.aliasTypeArguments?.length === 2
   ) {
     baseAlias = true;
     typeDescr = {
-      kind: 'map',
+      kind: "map",
       key: convertTypeToTypeDescription(
         convertedTypes,
         type.aliasTypeArguments[0],
@@ -152,11 +154,15 @@ export const convertTypeToTypeDescription = (
     };
   } else {
     typeDescr = {
-      kind: 'obj',
+      kind: "obj",
+      key: {
+        kind: "base",
+        name: "string",
+      },
       properties: {},
     };
 
-    for (let prop of type.getProperties()) {
+    for (const prop of type.getProperties()) {
       const propType = node
         ? checker.getTypeOfSymbolAtLocation(prop, node)
         : checker.getTypeOfSymbol(prop);
@@ -168,7 +174,7 @@ export const convertTypeToTypeDescription = (
         node,
         nextDepth,
       );
-      if (res.kind !== 'base' || res.name !== 'never') {
+      if (res.kind !== "base" || res.name !== "never") {
         typeDescr.properties[prop.escapedName as string] = {
           type: res,
           optional: Boolean(ts.SymbolFlags.Optional & prop.flags),
@@ -177,18 +183,17 @@ export const convertTypeToTypeDescription = (
     }
   }
 
-  if (type.isTypeParameter()) {
-    typeDescr = {
-      kind: 'type_parameter',
-      name: aliasName,
-    };
-  }
-
-  if (aliasName && !baseAlias) {
+  if (aliasName && !baseAlias && typeDescr) {
     convertedTypes[aliasName] = typeDescr;
   }
 
+  if (!typeDescr) {
+    throw new Error(
+      `Error transforming typescript type: ${checker.typeToString(type)}`,
+    );
+  }
+
   return aliasName && !baseAlias
-    ? { kind: 'alias', name: aliasName }
+    ? { kind: "alias", name: aliasName }
     : typeDescr;
 };

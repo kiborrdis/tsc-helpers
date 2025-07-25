@@ -1,3 +1,3 @@
-export * from './convertTypeToTypeDescription';
-export * from './traverseAST';
-export type * from './types';
+export * from "./convertTypeToTypeDescription";
+export * from "./traverseAST";
+export type * from "./types";

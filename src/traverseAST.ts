@@ -1,5 +1,5 @@
-import * as ts from 'typescript';
-import { debugLog } from './debugLog';
+import * as ts from "typescript";
+import { debugLog } from "./debugLog";
 
 type VisitFn = (accept: OutVisitFn, node: ts.Node) => void;
 type OutVisitFn = (node: ts.Node) => void;
@@ -11,7 +11,7 @@ export const createVisitRules = (
     const rule = visitRules[node.kind];
 
     if (rule) {
-      debugLog('accept', ts.SyntaxKind[node.kind]);
+      debugLog("accept", ts.SyntaxKind[node.kind]);
 
       if (Array.isArray(rule)) {
         rule.forEach((fn) => fn(accept, node));

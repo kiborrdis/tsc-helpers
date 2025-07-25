@@ -14,38 +14,38 @@ export type TypeDescription =
   | AliasTypeDescription;
 
 type BaseTypeDescription = RootTypeDescription<
-  'base',
+  "base",
   {
     name: string;
   }
 >;
 type LiteralTypeDescription = RootTypeDescription<
-  'literal',
+  "literal",
   {
     value: string | number | boolean;
   }
 >;
 type UnionTypeDescription = RootTypeDescription<
-  'union',
+  "union",
   {
     variants: TypeDescription[];
   }
 >;
 type TupleTypeDescription = RootTypeDescription<
-  'tuple',
+  "tuple",
   {
     values: TypeDescription[];
   }
 >;
 type ArrayTypeDescription = RootTypeDescription<
-  'array',
+  "array",
   {
     value: TypeDescription;
   }
 >;
 
 type MapTypeDescription = RootTypeDescription<
-  'map',
+  "map",
   {
     key: TypeDescription;
     value: TypeDescription;
@@ -53,18 +53,21 @@ type MapTypeDescription = RootTypeDescription<
 >;
 
 export type ObjTypeDescription = RootTypeDescription<
-  'obj',
+  "obj",
   {
     key: TypeDescription;
-    properties: Record<string, {
-      optional?: boolean,
-      type: TypeDescription
-    }>;
+    properties: Record<
+      string,
+      {
+        optional?: boolean;
+        type: TypeDescription;
+      }
+    >;
   }
 >;
 
 type AliasTypeDescription = RootTypeDescription<
-  'alias',
+  "alias",
   {
     name: string;
   }
