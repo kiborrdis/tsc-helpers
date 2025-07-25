@@ -73,8 +73,7 @@ export const convertTypeToTypeDescription = (
   if (type.isLiteral()) {
     typeDescr = {
       kind: "literal",
-      value:
-        typeof type.value !== "object" ? type.value : type.value.base10Value,
+      value: typeof type.value !== 'object' ? type.value : type.value.base10Value,
     };
   } else if (
     type === checker.getStringType() ||
@@ -157,7 +156,7 @@ export const convertTypeToTypeDescription = (
       kind: "obj",
       key: {
         kind: "base",
-        name: "string",
+        name: "string", 
       },
       properties: {},
     };
@@ -181,6 +180,14 @@ export const convertTypeToTypeDescription = (
         };
       }
     }
+  }
+
+  if (type.isTypeParameter()) {
+    typeDescr = {
+      // @ts-expect-error Temporary
+      kind: "type_parameter",
+      name: aliasName,
+    };
   }
 
   if (aliasName && !baseAlias && typeDescr) {
