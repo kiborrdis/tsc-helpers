@@ -5,7 +5,7 @@ import { createVisitRules, traverseAllChildren } from "../traverseAST";
 import { convertTypeToTypeDescription } from "../convertTypeToTypeDescription";
 import { TypeDescription } from "../types";
 
-describe("debugLog", () => {
+describe("convertTypeToTypeDescription", () => {
   const program = ts.createProgram(["./src/tests/test-types.ts"], {
     target: ts.ScriptTarget.ES5,
     module: ts.ModuleKind.CommonJS,
@@ -19,12 +19,7 @@ describe("debugLog", () => {
       checker,
       "BooleanObjectType",
     );
-    console.log(`Found type: ${type}, node: ${node}`);
-    if (!type || !node) {
-      throw new Error("Test type or node not found");
-    }
-
-    const converted = convertTypeToTypeDescription(types, type, checker, node);
+    convertTypeToTypeDescription(types, type, checker, node);
 
     expect(types["BooleanObjectType"]).toMatchObject({
       key: {
@@ -43,14 +38,39 @@ describe("debugLog", () => {
       },
     });
   });
-});
 
+  it("should properly convert boolean literal", () => {
+    const types: Record<string, TypeDescription> = {};
+    const [type, node] = getFindTypeWithName(
+      program,
+      checker,
+      "BooleanLiteralObjectType",
+    );
+    convertTypeToTypeDescription(types, type, checker, node);
+    expect(types["BooleanLiteralObjectType"]).toMatchObject({
+      key: {
+        kind: "base",
+        name: "string",
+      },
+      kind: "obj",
+      properties: {
+        test: {
+          optional: false,
+          type: {
+            kind: "literal",
+            value: true,
+          },
+        },
+      },
+    });
+  });
+});
 
 const getFindTypeWithName = (
   program: ts.Program,
   typeChecker: ts.TypeChecker,
   typeName: string,
-): [ts.Type | undefined, ts.Node | undefined] => {
+): [ts.Type, ts.Node] => {
   let foundType: ts.Type | undefined = undefined;
   let foundNode: ts.Node | undefined = undefined;
 
@@ -91,6 +111,10 @@ const getFindTypeWithName = (
       accept(sourceFile);
     }
   });
+
+  if (!foundNode || !foundType) {
+    throw new Error("Test type or node not found");
+  }
 
   return [foundType, foundNode];
 };

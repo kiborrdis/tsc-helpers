@@ -69,12 +69,20 @@ export const convertTypeToTypeDescription = (
       name: "____temporary",
     };
   }
-
-  if (type.isLiteral()) {
-    typeDescr = {
-      kind: "literal",
-      value: typeof type.value !== 'object' ? type.value : type.value.base10Value,
-    };
+  if (type.isLiteral() || type.flags & ts.TypeFlags.BooleanLiteral) {
+    if (type.flags & ts.TypeFlags.BooleanLiteral) {
+      typeDescr = {
+        kind: "literal",
+        // @ts-expect-error I'm not sure yet how to handle this properly
+        value: type.intrinsicName === "true" ? true : false, 
+      };
+    } else if(type.isLiteral()) {
+      typeDescr = {
+        kind: "literal",
+        value:
+          typeof type.value !== "object" ? type.value : type.value.base10Value,
+      };
+    }
   } else if (
     type === checker.getStringType() ||
     type === checker.getNumberType() ||
@@ -156,7 +164,7 @@ export const convertTypeToTypeDescription = (
       kind: "obj",
       key: {
         kind: "base",
-        name: "string", 
+        name: "string",
       },
       properties: {},
     };
@@ -165,6 +173,12 @@ export const convertTypeToTypeDescription = (
       const propType = node
         ? checker.getTypeOfSymbolAtLocation(prop, node)
         : checker.getTypeOfSymbol(prop);
+
+      console.log(
+        "start",
+        prop.escapedName,
+        propType.flags & ts.TypeFlags.BooleanLiteral,
+      );
 
       const res = convertTypeToTypeDescription(
         convertedTypes,
