@@ -1,5 +1,5 @@
 import * as ts from "typescript";
-import { TypeDescription } from "./types";
+import type { TypeDescription } from "./types";
 
 let ti = 0;
 

@@ -11,4 +11,10 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   tseslint.configs.recommended,
+  {
+    files: ["**/*.{test,spec}.{ts,tsx,js,jsx}"],
+    env: { "vitest-globals/env": true },
+    plugins: { vitest: true },
+    extends: ["plugin:vitest-globals/recommended"],
+  },
 ]);
