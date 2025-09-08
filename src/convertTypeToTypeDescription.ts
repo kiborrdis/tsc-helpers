@@ -180,12 +180,6 @@ export const convertTypeToTypeDescription = (
         ? checker.getTypeOfSymbolAtLocation(prop, node)
         : checker.getTypeOfSymbol(prop);
 
-      console.log(
-        "start",
-        prop.escapedName,
-        propType.flags & ts.TypeFlags.BooleanLiteral,
-      );
-
       const res = convertTypeToTypeDescription(
         convertedTypes,
         propType,
