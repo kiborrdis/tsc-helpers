@@ -3,7 +3,11 @@ import { debugLog } from "../debugLog";
 import * as ts from "typescript";
 import { createVisitRules, traverseAllChildren } from "../traverseAST";
 import { convertTypeToTypeDescription } from "../convertTypeToTypeDescription";
-import { TypeDescription } from "../types";
+import {
+  MapTypeDescription,
+  ObjTypeDescription,
+  TypeDescription,
+} from "../types";
 
 describe("convertTypeToTypeDescription", () => {
   const program = ts.createProgram(["./src/tests/test-types.ts"], {
@@ -63,6 +67,37 @@ describe("convertTypeToTypeDescription", () => {
         },
       },
     });
+  });
+
+  it("should properly convert record of unknowns literal", () => {
+    const types: Record<string, TypeDescription> = {};
+    const [type, node] = getFindTypeWithName(
+      program,
+      checker,
+      "UnknownsRecordType",
+    );
+    convertTypeToTypeDescription(types, type, checker, node);
+    expect(types["UnknownsRecordType"]).toMatchObject({
+      kind: "obj",
+      key: {
+        kind: "base",
+        name: "string",
+      },
+      properties: {
+        test: {
+          type: {
+            key: {
+              kind: "base",
+              name: "string",
+            },
+            value: {
+              kind: "unknown",
+            },
+            kind: "map",
+          },
+        },
+      },
+    } satisfies ObjTypeDescription);
   });
 });
 

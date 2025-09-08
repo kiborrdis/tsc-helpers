@@ -5,3 +5,8 @@ type BooleanObjectType = {
 type BooleanLiteralObjectType = {
   test: true;
 };
+
+
+type UnknownsRecordType = {
+  test: Record<string, unknown>;
+};

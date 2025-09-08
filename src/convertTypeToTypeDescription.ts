@@ -69,7 +69,13 @@ export const convertTypeToTypeDescription = (
       name: "____temporary",
     };
   }
-  if (type.isLiteral() || type.flags & ts.TypeFlags.BooleanLiteral) {
+
+  checker.getUnknownType()
+  if (type === checker.getUnknownType()) {
+    typeDescr = {
+      kind: "unknown",
+    };
+  } else if (type.isLiteral() || type.flags & ts.TypeFlags.BooleanLiteral) {
     if (type.flags & ts.TypeFlags.BooleanLiteral) {
       typeDescr = {
         kind: "literal",

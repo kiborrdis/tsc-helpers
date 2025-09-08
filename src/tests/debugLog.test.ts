@@ -5,7 +5,6 @@ describe('debugLog', () => {
   const originalConsoleLog = console.log;
 
   afterEach(() => {
-    // Restore environment and console
     console.log = originalConsoleLog;
     delete process.env.DEBUG;
     vi.restoreAllMocks();

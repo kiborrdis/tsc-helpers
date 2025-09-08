@@ -4,6 +4,7 @@ type RootTypeDescription<T extends string, D extends {}> = {
 } & D;
 
 export type TypeDescription =
+  | UnknownTypeDescription
   | BaseTypeDescription
   | LiteralTypeDescription
   | UnionTypeDescription
@@ -13,38 +14,42 @@ export type TypeDescription =
   | ObjTypeDescription
   | AliasTypeDescription;
 
-type BaseTypeDescription = RootTypeDescription<
+export type BaseTypeDescription = RootTypeDescription<
   "base",
   {
     name: string;
   }
 >;
-type LiteralTypeDescription = RootTypeDescription<
+export type UnknownTypeDescription = RootTypeDescription<
+  "unknown",
+  {}
+>;
+export type LiteralTypeDescription = RootTypeDescription<
   "literal",
   {
     value: string | number | boolean;
   }
 >;
-type UnionTypeDescription = RootTypeDescription<
+export type UnionTypeDescription = RootTypeDescription<
   "union",
   {
     variants: TypeDescription[];
   }
 >;
-type TupleTypeDescription = RootTypeDescription<
+export type TupleTypeDescription = RootTypeDescription<
   "tuple",
   {
     values: TypeDescription[];
   }
 >;
-type ArrayTypeDescription = RootTypeDescription<
+export type ArrayTypeDescription = RootTypeDescription<
   "array",
   {
     value: TypeDescription;
   }
 >;
 
-type MapTypeDescription = RootTypeDescription<
+export type MapTypeDescription = RootTypeDescription<
   "map",
   {
     key: TypeDescription;
@@ -66,7 +71,7 @@ export type ObjTypeDescription = RootTypeDescription<
   }
 >;
 
-type AliasTypeDescription = RootTypeDescription<
+export type AliasTypeDescription = RootTypeDescription<
   "alias",
   {
     name: string;
