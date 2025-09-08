@@ -9,6 +9,7 @@ export const convertAwaitedTypeToTypeDescription = (
   checker: ts.TypeChecker,
   node?: ts.Node,
   depth: string = "",
+  customConverter: ((type: ts.Type) => TypeDescription) | null = null,
 ): TypeDescription => {
   const awaitedType = checker.getAwaitedType(type);
 
@@ -26,6 +27,7 @@ export const convertAwaitedTypeToTypeDescription = (
     checker,
     node,
     depth,
+    customConverter,
   );
 };
 
@@ -35,6 +37,7 @@ export const convertTypeToTypeDescription = (
   checker: ts.TypeChecker,
   node?: ts.Node,
   depth: string = "",
+  customConverter: ((type: ts.Type) => TypeDescription | null) | null = null,
 ): TypeDescription => {
   const nextDepth = depth + " ";
   //
@@ -69,9 +72,11 @@ export const convertTypeToTypeDescription = (
       name: "____temporary",
     };
   }
+  const custom = customConverter && customConverter(type);
 
-  checker.getUnknownType()
-  if (type === checker.getUnknownType()) {
+  if (custom) {
+    typeDescr = custom;
+  } else if (type === checker.getUnknownType()) {
     typeDescr = {
       kind: "unknown",
     };
@@ -80,9 +85,9 @@ export const convertTypeToTypeDescription = (
       typeDescr = {
         kind: "literal",
         // @ts-expect-error I'm not sure yet how to handle this properly
-        value: type.intrinsicName === "true" ? true : false, 
+        value: type.intrinsicName === "true" ? true : false,
       };
-    } else if(type.isLiteral()) {
+    } else if (type.isLiteral()) {
       typeDescr = {
         kind: "literal",
         value:
@@ -122,6 +127,7 @@ export const convertTypeToTypeDescription = (
           checker,
           node,
           nextDepth,
+          customConverter,
         );
       }),
     };
@@ -140,6 +146,7 @@ export const convertTypeToTypeDescription = (
         checker,
         node,
         nextDepth,
+        customConverter,
       ),
     };
   } else if (
@@ -156,6 +163,7 @@ export const convertTypeToTypeDescription = (
         checker,
         node,
         nextDepth,
+        customConverter,
       ),
       value: convertTypeToTypeDescription(
         convertedTypes,
@@ -163,6 +171,7 @@ export const convertTypeToTypeDescription = (
         checker,
         node,
         nextDepth,
+        customConverter,
       ),
     };
   } else {
@@ -186,6 +195,7 @@ export const convertTypeToTypeDescription = (
         checker,
         node,
         nextDepth,
+        customConverter,
       );
       if (res.kind !== "base" || res.name !== "never") {
         typeDescr.properties[prop.escapedName as string] = {
