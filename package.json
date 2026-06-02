@@ -1,27 +1,28 @@
 {
   "type": "module",
   "name": "tsc-helpers",
-  "packageManager": "yarn@4.3.1",
+  "packageManager": "yarn@4.14.1",
   "main": "src/index.ts",
   "version": "1.0.0",
   "scripts": {
-    "test": "vitest",
+    "test": "vitest --run",
     "test:watch": "vitest --watch",
     "lint": "eslint ./src --ext .ts,.tsx,.js,.jsx",
     "format": "prettier --write ./src",
     "format:check": "prettier --check ./src",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
-    "verify": "yarn lint && yarn format:check && yarn typecheck"
+    "verify": "yarn lint && yarn test && yarn format:check && yarn typecheck"
   },
   "dependencies": {
-    "typescript": "^5.8.3"
+    "typescript": "^6.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",
     "@types/node": "^24.0.0",
     "eslint": "^9.31.0",
     "eslint-plugin-vitest": "^0.5.4",
+    "eslint-plugin-vitest-globals": "^1.6.1",
     "globals": "^16.3.0",
     "prettier": "3.6.2",
     "tsx": "^4.19.4",

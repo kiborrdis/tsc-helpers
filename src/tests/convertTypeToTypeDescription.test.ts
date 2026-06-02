@@ -1,13 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { debugLog } from "../debugLog";
+import { describe, it, expect } from "vitest";
 import * as ts from "typescript";
 import { createVisitRules, traverseAllChildren } from "../traverseAST";
 import { convertTypeToTypeDescription } from "../convertTypeToTypeDescription";
-import {
-  MapTypeDescription,
-  ObjTypeDescription,
-  TypeDescription,
-} from "../types";
+import { ObjTypeDescription, TypeDescription } from "../types";
 
 describe("convertTypeToTypeDescription", () => {
   const program = ts.createProgram(["./src/tests/test-types.ts"], {

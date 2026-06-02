@@ -20,10 +20,7 @@ export type BaseTypeDescription = RootTypeDescription<
     name: string;
   }
 >;
-export type UnknownTypeDescription = RootTypeDescription<
-  "unknown",
-  {}
->;
+export type UnknownTypeDescription = RootTypeDescription<"unknown", object>;
 export type LiteralTypeDescription = RootTypeDescription<
   "literal",
   {

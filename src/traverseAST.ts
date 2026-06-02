@@ -29,4 +29,3 @@ export const traverseAllChildren: VisitFn = (accept, node) => {
     accept(child);
   });
 };
-
