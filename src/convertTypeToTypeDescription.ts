@@ -98,6 +98,8 @@ export const convertTypeToTypeDescription = (
     type === checker.getStringType() ||
     type === checker.getNumberType() ||
     type === checker.getBooleanType() ||
+    type === checker.getUndefinedType() ||
+    type === checker.getNullType() ||
     type === checker.getNeverType()
   ) {
     typeDescr = {
@@ -189,7 +191,7 @@ export const convertTypeToTypeDescription = (
         ? checker.getTypeOfSymbolAtLocation(prop, node)
         : checker.getTypeOfSymbol(prop);
 
-      const res = convertTypeToTypeDescription(
+      let res = convertTypeToTypeDescription(
         convertedTypes,
         propType,
         checker,
@@ -197,10 +199,19 @@ export const convertTypeToTypeDescription = (
         nextDepth,
         customConverter,
       );
+      let isOptional = Boolean(ts.SymbolFlags.Optional & prop.flags);
+      if (res.kind === 'union' && res.variants.some(v => v.kind === 'base' && v.name === 'undefined')) {
+        isOptional = true;
+        res.variants = res.variants.filter(v => !(v.kind === 'base' && v.name === 'undefined'));
+        if (res.variants.length === 1) {
+          res = res.variants[0];
+        }
+      }
+
       if (res.kind !== "base" || res.name !== "never") {
         typeDescr.properties[prop.escapedName as string] = {
           type: res,
-          optional: Boolean(ts.SymbolFlags.Optional & prop.flags),
+          optional: isOptional,
         };
       }
     }

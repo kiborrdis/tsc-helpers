@@ -6,7 +6,7 @@ import { ObjTypeDescription, TypeDescription } from "../types";
 
 describe("convertTypeToTypeDescription", () => {
   const program = ts.createProgram(["./src/tests/test-types.ts"], {
-    target: ts.ScriptTarget.ES5,
+    target: ts.ScriptTarget.ES2020,
     module: ts.ModuleKind.CommonJS,
   });
   const checker = program.getTypeChecker();
@@ -20,7 +20,7 @@ describe("convertTypeToTypeDescription", () => {
     );
     convertTypeToTypeDescription(types, type, checker, node);
 
-    expect(types["BooleanObjectType"]).toMatchObject({
+    expect(types["BooleanObjectType"]).toEqual({
       key: {
         kind: "base",
         name: "string",
@@ -46,7 +46,7 @@ describe("convertTypeToTypeDescription", () => {
       "BooleanLiteralObjectType",
     );
     convertTypeToTypeDescription(types, type, checker, node);
-    expect(types["BooleanLiteralObjectType"]).toMatchObject({
+    expect(types["BooleanLiteralObjectType"]).toEqual({
       key: {
         kind: "base",
         name: "string",
@@ -72,7 +72,7 @@ describe("convertTypeToTypeDescription", () => {
       "UnknownsRecordType",
     );
     convertTypeToTypeDescription(types, type, checker, node);
-    expect(types["UnknownsRecordType"]).toMatchObject({
+    expect(types["UnknownsRecordType"]).toEqual({
       kind: "obj",
       key: {
         kind: "base",
@@ -80,6 +80,7 @@ describe("convertTypeToTypeDescription", () => {
       },
       properties: {
         test: {
+          optional: false,
           type: {
             key: {
               kind: "base",
@@ -93,6 +94,73 @@ describe("convertTypeToTypeDescription", () => {
         },
       },
     } satisfies ObjTypeDescription);
+  });
+
+
+  it("should properly convert display style type", () => {
+    const types: Record<string, TypeDescription> = {};
+    const [type, node] = getFindTypeWithName(
+      program,
+      checker,
+      "NotOptionals",
+    );
+    convertTypeToTypeDescription(types, type, checker, node);
+    expect(types["NotOptionals"]).toEqual({
+      kind: "obj",
+      key: {
+        kind: "base",
+        name: "string",
+      },
+      properties: {
+        str: {
+          optional: false,
+          type: {
+            kind: "base",
+            name: "number",
+          },
+        },
+        num: {
+          optional: false,
+          type: {
+            kind: "base",
+            name: "string",
+          },
+        },
+      },
+    });
+  });
+
+  it("should properly convert display style type", () => {
+    const types: Record<string, TypeDescription> = {};
+    const [type, node] = getFindTypeWithName(
+      program,
+      checker,
+      "Optionals",
+    );
+    convertTypeToTypeDescription(types, type, checker, node);
+    expect(types["Optionals"]).toEqual({
+      kind: "obj",
+      key: {
+        kind: "base",
+        name: "string",
+      },
+      properties: {
+        str: {
+          optional: true,
+          type: {
+            kind: "base",
+            name: "number",
+          },
+        },
+        num: {
+          optional: true,
+          type: {
+            kind: "base",
+            name: "string",
+          },
+        },
+      },
+    });
   });
 });
 

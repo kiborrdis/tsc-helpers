@@ -12,3 +12,13 @@ type BooleanLiteralObjectType = {
 type UnknownsRecordType = {
   test: Record<string, unknown>;
 };
+
+export type Optionals = {
+  str?: number;
+  num?: string;
+};
+
+export type NotOptionals = {
+  str: number;
+  num: string;
+};
